@@ -12,7 +12,7 @@ for i in range(25):
     else:
         actions.append(action_types[r.randint(1, 4)])
 
-idx = 0;
+idx = 0
 for i in range(25):
     print(actions[idx], actions[idx+1], actions[idx+2])
     idx += 3
