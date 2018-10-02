@@ -1,0 +1,13 @@
+contactID,actionID,timestamp,productID,quantity,moneySpent
+X,0,150,,,
+X,1,151,,,
+X,2,152,A,2,100
+X,1,170,,,
+X,2,171,B,3,150
+X,3,180,,,
+Y,0,130,,,
+Y,1,131,,,
+Y,2,132,C,1,50
+Z,0,190,,,
+Z,2,,,,
+Z,3,191,,,
