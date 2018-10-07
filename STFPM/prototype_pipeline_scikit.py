@@ -14,6 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn import svm
 import random
 
+###### DATA GENERATOR STARTS HERE
 
 class Action(Enum):
     EMAIL_VIEW_LINK = 0
@@ -23,6 +24,7 @@ class Action(Enum):
 
 
 random.seed(42)
+#
 contactIDs = [str(i) for i in range(0, 11)]
 deliveryIDs = [str(i) for i in range(20, 31)]
 
@@ -36,23 +38,24 @@ for contact in contactIDs:
             random.randint(0,4),
             deliveryIDs[random.randint(0, len(deliveryIDs)-1)],
             random.randint(0, 300),
-            str(random.randint(9999, 99999999)) ])
+            str(random.randint(9999, 99999999))
+        ])
 
-columns = ['contactID', 'actionID', 'deliveryID', 'timestamp', 'linkID' ]
+columns = ['contactID', 'actionID', 'deliveryID', 'timestamp', 'linkID']
 
 raw_df = pd.DataFrame(columns=columns, data=allActions)
 
+###### DATA GENERATOR ENDS HERE
 
-###### FEATURE EXTRACTION START HERE!!!
+###### FEATURE EXTRACTION STARTS HERE!!!
 
 feature_df = pd.DataFrame(columns=['contactID'])
 
-# for each contact
-for c in raw_df['contactID'].unique():
-    # create a dataframe
-    tmp = raw_df['contactID' == c]
-    tmp.apply(lambda column: column['timestamp'].max() - column['timestamp'].min(), axis=1)
-
+# Add a column for the new feature.
+# When you call groupby, you are forking the execution of how the data is processed. In this case, we are grouping
+# by contactID, selecting the 'timestamp' column, and running some function for each series of timestamps.
+feature_df['lifespan'] = raw_df.groupby('contactID')['timestamp'].apply(lambda x: x.max() - x.min())
+feature_df['avg_num_actions_per_email'] = raw_df.groupby('contactID').apply(lambda cdf: cdf.groupby('deliveryID'))
 
 # anova_filter = SelectKBest(f_regression, k=5)
 # clf = svm.SVC(kernel='linear')
