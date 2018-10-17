@@ -19,6 +19,7 @@ class Action(Enum):
     UNSUBSCRIBE = 1
     VIEW_LINK = 2
     FORWARD_FRIEND = 3
+    OPEN = 4
 
 
 # list of all recorded actions by all known contacts
