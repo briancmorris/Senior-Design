@@ -2,24 +2,11 @@
 # 10/13/2018
 
 import numpy as np
-from enum import Enum
 import pandas as pd
 from typing import List, Dict, Any
 from datetime import *
 from uuid import uuid4
-
-
-class Action(Enum):
-    """
-    Enumeration of possible contact actions. Primary use is
-    for visualization and displaying action string description
-    given an actionID.
-    """
-    SUBSCRIBE = 0
-    UNSUBSCRIBE = 1
-    VIEW_LINK = 2
-    FORWARD_FRIEND = 3
-    OPEN = 4
+from action_types import ActionEnum
 
 
 # list of all recorded actions by all known contacts
@@ -38,7 +25,7 @@ MIN_ACTIONS_PER_EMAIL = 5
 MAX_ACTIONS_PER_EMAIL = 10
 VIEWERSHIP_SPAN = timedelta(weeks=8)  # contacts lose interest in emails over this span and then unsubscribe
 
-CONTACT_INTEREST_DROPOUT_THRESHOLD = 0.2
+CONTACT_INTEREST_DROPOUT_THRESHOLD = 0.2  # contacts unsubscribe when interest_ratio falls below this threshold
 
 RANDOM_SEED = 42
 
@@ -88,7 +75,7 @@ for current_date in daterange_interval(START_DATE, STOP_DATE, EMAIL_INTERVAL):
         contact_action_event = {
             'emailID': CURRENT_EMAIL_ID,
             'timestamp': current_date,
-            'actionID': Action.SUBSCRIBE.value,
+            'actionID': ActionEnum.SUBSCRIBE.value,
             'contactID': contactID,
             'linkID': None,
         }
@@ -104,7 +91,7 @@ for current_date in daterange_interval(START_DATE, STOP_DATE, EMAIL_INTERVAL):
             contact_action_event = {
                 'emailID': CURRENT_EMAIL_ID,
                 'timestamp': current_date,
-                'actionID': Action.UNSUBSCRIBE.value,
+                'actionID': ActionEnum.UNSUBSCRIBE.value,
                 'contactID': contactID,
                 'linkID': None,
             }
@@ -126,7 +113,7 @@ for current_date in daterange_interval(START_DATE, STOP_DATE, EMAIL_INTERVAL):
             contact_action_event = {
                 'emailID': CURRENT_EMAIL_ID,
                 'timestamp': current_date + timedelta(minutes=int(link_view_offsets[i])),
-                'actionID': Action.VIEW_LINK.value,
+                'actionID': ActionEnum.VIEW_LINK.value,
                 'contactID': contactID,
                 'linkID': np.random.choice(all_emails[CURRENT_EMAIL_ID]),
             }
@@ -140,5 +127,5 @@ for current_date in daterange_interval(START_DATE, STOP_DATE, EMAIL_INTERVAL):
 
 
 raw_df = pd.DataFrame(data=all_actions,
-                        columns=['contactID', 'actionID', 'emailID', 'timestamp', 'linkID'])
+                      columns=['contactID', 'actionID', 'emailID', 'timestamp', 'linkID'])
 raw_df.to_csv('medium_dataset_raw.csv')
