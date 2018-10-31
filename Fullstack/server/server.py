@@ -29,10 +29,8 @@ def hello():
 UPLOAD_FOLDER = './Data/'
 @app.route("/results", methods=['POST'])
 def getResults():
-    print("GOT HERE")
     if 'file' not in request.files:
         return 'No File Uploaded'
-    print("GOT HERE")
     file = request.files['file']
     if file.filename == '':
         return 'No selected File'
