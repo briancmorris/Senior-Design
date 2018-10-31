@@ -4,6 +4,7 @@ import React from 'react'
 import RadioBox from './RadioBox'
 import Checkbox from './Checkbox'
 import {featureExtractions, getDataFile} from './serverUtility'
+import styles from '../css/styles.css'
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -41,6 +42,8 @@ export default class App extends React.Component {
   handleUpload(){
     const data = new FormData()
     data.append('file', this.state.selectedFile, this.state.selectedFile.name)
+    data.append('model', this.state.model)
+    data.append('features', this.state.featuresSelected)
 
     axios.post('/results', data, {
       onUploadProgress: ProgressEvent => {
@@ -79,6 +82,7 @@ export default class App extends React.Component {
     const featureCheckbox = <Checkbox title='Pick Features:' type='model' elements={this.state.features} onChange={this.changeFeature}/>
     return(
     <div>
+      <div className={styles.header} > Fuego</div>
       <button onClick={this.downloadcsv}>Create a random csv data file</button>
       <div>{fileUpload}</div>
       <div> {modelRadiobox}</div>
