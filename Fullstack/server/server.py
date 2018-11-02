@@ -38,7 +38,7 @@ def getResults():
         filename = secure_filename(file.filename)
         print(file)
         file.save(os.path.join(app.root_path, 'Data', filename))
-        return 'Got the file'
+        return 'Churn out is in 3-6 months'
     
     
 
