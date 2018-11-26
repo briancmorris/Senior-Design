@@ -12,6 +12,11 @@ class FETotalForwarded(TransformerMixin):
         return self
 
     def transform(self, X):
+        """
+        Transforms the web log data into contacts and their total number of emails forwarded
+        :param X: the raw web log data
+        :return: the contacts and their associated number of emails forwarded
+        """
         assert(isinstance(X, pd.DataFrame))
 
         per_contact_groupby = X.groupby('contactID')

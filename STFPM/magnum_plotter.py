@@ -30,21 +30,19 @@ def dfScatter(df, xcol='timestamp', ycol='contactID', catcol='actionID'):
     categories = np.unique(df[catcol].unique())
     colors = np.linspace(0, 1, len(categories))
     colordict = dict(zip(categories, colors))
-
-    cmap_name = 'twilight'
+    cmap_name = 'plasma'
     my_cm = cm.cmaps_listed[cmap_name]
-    legend_colors = my_cm(colors)
 
     df["Color"] = df[catcol].apply(lambda x: colordict[x])
-    ax.scatter(df[xcol].tolist(), df[ycol].tolist(), cmap=cmap_name, c=df.Color, marker='|')
+    ax.scatter(df[xcol].tolist(), df[ycol].tolist(), cmap=cmap_name, c=df.Color, marker='.', s=(72./fig.dpi)**2)
     ax.yaxis.set_ticklabels([])
-    ax.xaxis.set_ticklabels([])
     ax.set_ylabel("Contacts")
     legend_elements = [Line2D([0], [0], marker='o', color=my_cm(colordict[c]),
                               label=Action(c).name) for c in categories]
-    fig.legend(loc='right', bbox_to_anchor=(1.3, 0.5), handles=legend_elements)
+    ax.legend(loc='upper left', handles=legend_elements,)  # bbox_to_anchor=(0.9, 0.9))
+    ax.xaxis.set_ticklabels([])
     # fig.autofmt_xdate()
-    # ax.set_xlim([date(2014, 11, 17), date(2014, 11, 18)])
+    # ax.set_xlim(date(2012, 1, 1), date(2014, 1, 1))
     ax.set_title('Contact Action Timeline')
     # ax.yaxis.grid(True)
     return fig
@@ -53,4 +51,4 @@ def dfScatter(df, xcol='timestamp', ycol='contactID', catcol='actionID'):
 raw_df = pd.read_csv('medium_dataset_raw.csv')
 
 fig = dfScatter(raw_df, xcol='timestamp', ycol='contactID', catcol='actionID')
-fig.savefig('medium_fig.png', bbox_inches='tight', dpi=300)
+fig.savefig('medium_fig.png', bbox_inches='tight', figsize=(20, 20), dpi=600)
