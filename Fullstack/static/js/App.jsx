@@ -42,7 +42,8 @@ export default class App extends React.Component {
   handleUpload(){
     const data = new FormData()
     data.append('file', this.state.selectedFile, this.state.selectedFile.name)
-    data.append('model', this.state.model)
+    console.log(this.state.modelSelected)
+    data.append('model', this.state.modelSelected)
     data.append('features', this.state.featuresSelected)
 
     axios.post('/results', data, {
