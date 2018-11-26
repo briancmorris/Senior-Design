@@ -2,6 +2,12 @@
 import os
 from flask import Flask, render_template, jsonify, request, send_file
 from werkzeug.utils import secure_filename
+import server_utilities
+
+
+# for key in server_utilities.features.items() :
+#     print(key)
+
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -18,10 +24,11 @@ def downloadDataFile():
 
 @app.route("/setUp")
 def hello():
+    features = [k for k, v in server_utilities.features.items()]
     setup = jsonify({
         "setup": {
-            "features": ['lifespan', 'emails recv'],
-            "models": ['churn-out', 'lifetime value']
+            "features": features,
+            "models": ['Churn-out']
         }
     })
     return setup    
@@ -36,9 +43,12 @@ def getResults():
         return 'No selected File'
     if file:
         filename = secure_filename(file.filename)
-        print(file)
+        # print(file)
         file.save(os.path.join(app.root_path, 'Data', filename))
-        return 'Churn out is in 3-6 months'
+        featuresSelected = request.form['features']
+        featuresToBeExtracted = [(k,v()) for k,v in server_utilities.features.items() if k in featuresSelected]
+        results = server_utilities.framework.frameworkRunner(featuresToBeExtracted)
+        return jsonify(results)
     
     
 
