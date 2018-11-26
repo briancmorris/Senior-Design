@@ -84,9 +84,11 @@ export default class App extends React.Component {
     <div>
       <div className={styles.header} > Fuego</div>
       <button onClick={this.downloadcsv}>Create a random csv data file</button>
-      <div>{fileUpload}</div>
-      <div> {modelRadiobox}</div>
-      <div> {featureCheckbox}</div>
+      <div className={styles.container}>
+        <div>{fileUpload}</div>
+        <div> {modelRadiobox}</div>
+        <div> {featureCheckbox}</div>
+      </div>
       <button onClick={this.handleUpload}>Upload</button>
       <div>
         <div> File Upload: {Math.round(this.state.loaded,2) }%</div>
