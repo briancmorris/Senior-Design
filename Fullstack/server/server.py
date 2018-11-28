@@ -2,6 +2,7 @@
 import os
 from flask import Flask, render_template, jsonify, request, send_file
 from werkzeug.utils import secure_filename
+import magnum_datagen
 import server_utilities
 
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
@@ -14,7 +15,8 @@ def index():
 @app.route("/downloadDataFile")
 def downloadDataFile():
     try:
-        return send_file('./Data/exampleFile.csv', as_attachment=True)
+        return send_file(magnum_datagen.genRunner(), as_attachment=True)
+        # return send_file('./Data/exampleFile.csv', as_attachment=True)
     except Exception as e:
         return e
 
@@ -43,7 +45,7 @@ def getResults():
         file.save(os.path.join(app.root_path, 'Data', filename))
         featuresSelected = request.form['features']
         featuresToBeExtracted = [(k,v()) for k,v in server_utilities.features.items() if k in featuresSelected]
-        results = server_utilities.framework.frameworkRunner(featuresToBeExtracted)
+        results = server_utilities.framework.frameworkRunner(featuresToBeExtracted, filename)
         return jsonify(results)
     
     
