@@ -4,10 +4,6 @@ from flask import Flask, render_template, jsonify, request, send_file
 from werkzeug.utils import secure_filename
 import server_utilities
 
-
-# for key in server_utilities.features.items() :
-#     print(key)
-
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 

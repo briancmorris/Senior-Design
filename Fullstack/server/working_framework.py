@@ -173,8 +173,9 @@ def frameworkRunner(featuresSelected) :
     # by default performs StratifiedKFold CV
     metrics = ["accuracy", "precision", "recall", "f1"]
     results = cross_validate(abc, X, y, cv=5, scoring=metrics)
-    print(results)
-    return results
+
+    modified_results = [(k,np.mean(v)) for k,v in results.items()]
+    return modified_results
     # print(cross_val_score(abc, X, y, cv=5))
 
 

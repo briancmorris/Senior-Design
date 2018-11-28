@@ -39,7 +39,7 @@ export default class App extends React.Component {
     })
   }
 
-  handleUpload(){
+  async handleUpload(){
     const data = new FormData()
     data.append('file', this.state.selectedFile, this.state.selectedFile.name)
     console.log(this.state.modelSelected)
@@ -53,9 +53,17 @@ export default class App extends React.Component {
         })
       },
     })
-    .then(res => {
+    .then(async res => {
       console.log(res)
-      this.setState({output: res.data})
+      const formattedOutput = res.data.map(element =>{
+        return <div>
+          <p>{element[0] + ': ' + element[1]}</p>
+        </div>
+      })
+      
+      console.log(formattedOutput)
+
+      this.setState({output: formattedOutput})
       console.log(res.statusText)
     })
 
@@ -83,7 +91,7 @@ export default class App extends React.Component {
     const featureCheckbox = <Checkbox title='Pick Features:' type='model' elements={this.state.features} onChange={this.changeFeature}/>
     return(
     <div>
-      <div className={styles.header} > Fuego</div>
+      <div className={styles.header} > Littlefoot</div>
       <button onClick={this.downloadcsv}>Create a random csv data file</button>
       <div className={styles.container}>
         <div>{fileUpload}</div>
