@@ -8,6 +8,9 @@ import server_utilities
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+def get_app():
+    return app
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -21,7 +24,7 @@ def downloadDataFile():
         return e
 
 @app.route("/setUp")
-def hello():
+def getProps():
     features = [k for k, v in server_utilities.features.items()]
     setup = jsonify({
         "setup": {

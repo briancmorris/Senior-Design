@@ -10,6 +10,7 @@ from uuid import uuid4
 from action_types import ActionEnum
 
 
+<<<<<<< HEAD
 # list of all recorded actions by all known contacts
 # dict keys are: 'actionID', 'contactID', 'emailID', 'linkID', 'timestamp'
 all_actions: List[Dict[str, Any]] = []
@@ -46,6 +47,46 @@ def rand_str(length=5) -> str:
     return uuid4().hex[:length]
 
 def genRunner():
+=======
+def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = datetime(2012, 12, 1),
+                               EMAIL_INTERVAL = timedelta(weeks=1), LINKS_PER_EMAIL = 5, NEW_CONTACTS_PER_EMAIL = 5,
+                               MIN_ACTIONS_PER_EMAIL = 5, MAX_ACTIONS_PER_EMAIL = 10, VIEWERSHIP_SPAN = timedelta(weeks=8),
+                               CONTACT_INTEREST_DROPOUT_THRESHOLD = 0.2, RANDOM_SEED = None):
+    """
+    Generate contact actions in an email-driven manner. Beginning at the defined starting date, emails are sent out
+    on a fixed period. Upon delivery,  new contacts are added and current contacts perform actions
+    such as viewing links or unsubscribing. All contacts have a declining 'interest' value and fixed 'interest rate'.
+
+    :param START_DATE: Starting record for data generation.
+    :param STOP_DATE: Stopping record for data generation.
+    :param EMAIL_INTERVAL: Rate at which emails should appear.
+    :param LINKS_PER_EMAIL: Number of unique links per email. Links are random IDs associated with an email via a dictionary.
+    :param NEW_CONTACTS_PER_EMAIL: Maximum number of contacts to add for every new email.
+    :param MIN_ACTIONS_PER_EMAIL: Minimum number of actions a contact can make per received email.
+    :param MAX_ACTIONS_PER_EMAIL: Maximum number of actions a contact can make per received email.
+    :param VIEWERSHIP_SPAN: Contacts lose interest in emails over this span and then unsubscribe.
+    :param CONTACT_INTEREST_DROPOUT_THRESHOLD: Contacts unsubscribe when interest_ratio falls below this threshold.
+    :param RANDOM_SEED: Set numpy random number generator for debugging.
+    :return: file_name: relative path name of generated CSV file
+    """
+    # List of all recorded actions by all known contacts
+    # Dict keys are: 'actionID', 'contactID', 'emailID', 'linkID', 'timestamp'
+    all_actions: List[Dict[str, Any]] = []
+
+    np.random.seed(RANDOM_SEED)
+
+    def daterange_interval(start_date, end_date, interval):
+        """ Generator for supplying a sequence of dates by a periodic interval. """
+        last_date = start_date
+        while last_date < end_date:
+            yield last_date + interval
+            last_date += interval
+
+    def rand_str(length=5) -> str:
+        """ Create a random string of a given length using UUID. """
+        return uuid4().hex[:length]
+
+>>>>>>> b2442def7e37cd8ceddaffab22067361e42318ad
     all_emails: Dict[str, List] = {}
     all_contacts: Dict = {}
     for current_date in daterange_interval(START_DATE, STOP_DATE, EMAIL_INTERVAL):
@@ -58,7 +99,10 @@ def genRunner():
             # 'contactID': None,
             # 'linkID': None,
         }
+<<<<<<< HEAD
         print("EMAIL PERIOD: ID={}, DATE={}".format(CURRENT_EMAIL_ID, current_date))
+=======
+>>>>>>> b2442def7e37cd8ceddaffab22067361e42318ad
         all_actions.append(email_event)
 
         # generate links for each email
@@ -68,7 +112,10 @@ def genRunner():
         # number of new contacts introduced in this mailing interval
         # poisson distribution is left-leaning probability distribution
         num_new_contacts = np.random.poisson(NEW_CONTACTS_PER_EMAIL)
+<<<<<<< HEAD
         print("\tNEW CONTACTS={}".format(num_new_contacts))
+=======
+>>>>>>> b2442def7e37cd8ceddaffab22067361e42318ad
 
         for i in range(num_new_contacts):
             contactID = 'c_' + rand_str()
@@ -104,8 +151,11 @@ def genRunner():
                 interest_ratio * MIN_ACTIONS_PER_EMAIL,
                 interest_ratio * MAX_ACTIONS_PER_EMAIL)
             link_view_offsets = np.random.poisson(lam=3, size=num_actions)
+<<<<<<< HEAD
             print("\tContact={}, interest_ratio={}, num_actions={}, link_view_offsets={}"
                 .format(contactID, interest_ratio, num_actions, link_view_offsets))
+=======
+>>>>>>> b2442def7e37cd8ceddaffab22067361e42318ad
 
             for i in range(num_actions):
                 # generate a series of actions offset randomly from the email arrival by some minutes
@@ -122,6 +172,7 @@ def genRunner():
 
         if len(remove_contacts) > 0:
             # remove contacts that lost interest after this email.
+<<<<<<< HEAD
             print('Removed Contacts: {}'.format(remove_contacts))
             for remove_me in remove_contacts:
                 del all_contacts[remove_me]
@@ -132,3 +183,17 @@ def genRunner():
     filename = './Data/not_medium_dataset_raw' + str(int(time.time)) + '.csv'
     raw_df.to_csv(filename )
     return filename
+=======
+            for remove_me in remove_contacts:
+                del all_contacts[remove_me]
+
+    raw_df = pd.DataFrame(data=all_actions,
+                          columns=['contactID', 'actionID', 'emailID', 'timestamp', 'linkID'])
+
+    # TODO: handle potential file name collisions
+    file_name = './Data/data_{:s}.csv'.format(datetime.now().strftime("%Y%m%d-%H%M%S"))
+
+    raw_df.to_csv(file_name)
+
+    return file_name
+>>>>>>> b2442def7e37cd8ceddaffab22067361e42318ad
