@@ -1,4 +1,6 @@
 import React from 'react'
+import styles from '../css/styles.css'
+
 export default class Checkbox extends React.Component {
   constructor(props) {
     super(props)
@@ -42,7 +44,7 @@ export default class Checkbox extends React.Component {
     return(
       <div>
         <form>
-          <h1>{this.props.title}</h1>
+          <h1 className={styles.title}>{this.props.title}</h1>
           {this.getElements()}
         </form>
       </div>

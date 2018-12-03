@@ -92,18 +92,18 @@ export default class App extends React.Component {
     return(
     <div>
       <div className={styles.header} > Littlefoot</div>
-      <button onClick={this.downloadcsv}>Create a random csv data file</button>
+      <button className={styles.dbutton} onClick={this.downloadcsv}>Create a random csv data file</button>
       <div className={styles.container}>
-        <div>{fileUpload}</div>
-        <div> {modelRadiobox}</div>
-        <div> {featureCheckbox}</div>
+        <div className={styles.item}>{fileUpload}</div>
+        <div className={styles.item}> {modelRadiobox}</div>
+        <div className={styles.item}> {featureCheckbox}</div>
+        <button onClick={this.handleUpload}>Upload</button>
+        <div>
+          <div> File Upload: {Math.round(this.state.loaded,2) }%</div>
+          <div> {this.state.output}</div>
+        </div>
       </div>
-      <button onClick={this.handleUpload}>Upload</button>
-      <div>
-        <div> File Upload: {Math.round(this.state.loaded,2) }%</div>
-        <div> {this.state.output}</div>
-      </div>
-      </div>
+    </div>
     )
   }
 }

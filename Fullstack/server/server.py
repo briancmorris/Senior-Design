@@ -18,7 +18,9 @@ def index():
 @app.route("/downloadDataFile")
 def downloadDataFile():
     try:
-        return send_file(magnum_datagen.genRunner(), as_attachment=True)
+        filename = magnum_datagen.generate_data_email_driven()
+        print(filename)
+        return send_file(filename, as_attachment=True)
         # return send_file('./Data/exampleFile.csv', as_attachment=True)
     except Exception as e:
         return e

@@ -20,11 +20,12 @@ const getDataFile = async () => {
             url: '/downloadDataFile',
             method: 'GET',
             responseType: 'blob', 
-          }).then((response) => {
+          }).then(async (response) => {
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', 'test.csv');
+            var now = await Date.now()
+            link.setAttribute('download', 'test_' + now + '.csv');
             document.body.appendChild(link);
             link.click();
           });
