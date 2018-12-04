@@ -3,7 +3,7 @@ from feature_extraction import lifespan
 
 class TestLifespan(object):
     def test_lifespan(self):
-        test_df = pd.read_csv('Fullstack/server/feature_extraction/tests/test_files/test_lifespan.csv', parse_dates=['timestamp'])
+        test_df = pd.read_csv('./test_files/test_lifespan.csv', parse_dates=['timestamp'])
         fe_lifespan = lifespan.LifespanTransformer()
         trans_df = fe_lifespan.transform(test_df)
 

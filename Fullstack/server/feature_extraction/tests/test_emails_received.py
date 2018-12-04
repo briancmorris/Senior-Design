@@ -3,7 +3,7 @@ from feature_extraction import recv
 
 class TestEmailsReceived(object):
     def test_received(self):
-        test_df = pd.read_csv('Fullstack/server/feature_extraction/tests/test_files/test_emails_received.csv',
+        test_df = pd.read_csv('./test_files/test_emails_received.csv',
                               dtype={'actionID': 'float'}, parse_dates=['timestamp'])
         fe_emails_received = recv.EmailsReceivedTransformer()
         trans_df = fe_emails_received.transform(test_df)
