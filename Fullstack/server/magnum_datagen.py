@@ -71,7 +71,13 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
 
         for i in range(num_new_contacts):
             contactID = 'c_' + rand_str()
-            all_contacts[contactID] = {'id': contactID, 'start_date': current_date}
+            # vary the VIEWERSHIP_SPAN my some multiplier between [0.5 .. 1.5]
+            interest_rate = np.random.rand() + 0.5
+            all_contacts[contactID] = {
+                'id': contactID,
+                'start_date': current_date,
+                'interest_rate': interest_rate
+            }
             contact_action_event = {
                 'emailID': CURRENT_EMAIL_ID,
                 'timestamp': current_date,
@@ -86,7 +92,7 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
             # number of actions this contact will perform for the current email
             # TODO: num_actions depends on how long this contact has been a subscriber
             # TODO: num_actions should decrease in proportion to the length of time they have been a subscriber
-            interest_ratio = 1 - (current_date - info['start_date']) / VIEWERSHIP_SPAN
+            interest_ratio = 1 - (current_date - info['start_date']) / (VIEWERSHIP_SPAN * info['interest_rate'])
             if interest_ratio < CONTACT_INTEREST_DROPOUT_THRESHOLD:
                 contact_action_event = {
                     'emailID': CURRENT_EMAIL_ID,
