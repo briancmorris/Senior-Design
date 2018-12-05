@@ -2,7 +2,7 @@
 import os
 from flask import Flask, render_template, jsonify, request, send_file
 from werkzeug.utils import secure_filename
-import magnum_datagen
+import data_generator_by_email
 import server_utilities
 
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
@@ -18,7 +18,7 @@ def index():
 @app.route("/downloadDataFile")
 def downloadDataFile():
     try:
-        filename = magnum_datagen.generate_data_email_driven()
+        filename = data_generator_by_email.generate_data_email_driven()
         print(filename)
         return send_file(filename, as_attachment=True)
         # return send_file('./Data/exampleFile.csv', as_attachment=True)

@@ -5,7 +5,7 @@ from feature_extraction.prop_opened import PropOpenedTransformer
 from feature_extraction.recv import EmailsReceivedTransformer
 from feature_extraction.total_emails_opened import EmailsOpenedTransformer
 from feature_extraction.total_fwd import FETotalForwarded
-import working_framework
+import littlefoot
 
 
 features = {
@@ -18,4 +18,4 @@ features = {
   'Total Emails Forwarded': FETotalForwarded
   }
 
-framework = working_framework
+framework = littlefoot
