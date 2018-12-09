@@ -56,7 +56,7 @@ def getContactsForExperiment(df: pd.DataFrame, numContacts: int, percentChurnedO
     return result
 
 
-def getLabelledPointsFromContacts(input: List[pd.DataFrame], percentChurnedOut: float) -> List[LabelledPoint]:
+def getLabelledPointsFromContacts(input: List[pd.DataFrame], percentChurnedOut: float, featuresSelected) -> List[LabelledPoint]:
     # input dataframe is a list of data frames
     # each dataframe represents a list of user actions (each with a timestamp)
 
@@ -68,9 +68,12 @@ def getLabelledPointsFromContacts(input: List[pd.DataFrame], percentChurnedOut: 
     #   a single contact may provide multiple labelled points
     result = []
 
-    tlc = TotalLinksClicked()
-    tf = FETotalForwarded()
-    features_to_be_extracted = [('links_clicked', tlc)]
+    # tlc = TotalLinksClicked()
+    # tf = FETotalForwarded()
+    # features_to_be_extracted = [('links_clicked', tlc)]
+    # print(features_to_be_extracted)
+
+    # print(featuresSelected)
 
     for df in input:
         # mask each df to only last month of activity
@@ -79,7 +82,7 @@ def getLabelledPointsFromContacts(input: List[pd.DataFrame], percentChurnedOut: 
         # check if current data frame contains an unsubscribe action
         label_churn = (1, 0)[float(ActionEnum.UNSUBSCRIBE.value) in df.actionID.values]
         features = [] # {} to make a dictionary
-        for f in features_to_be_extracted:
+        for f in featuresSelected:
             # print(f[1].transform(df).iloc[0])
             # builds a features DICTIONARY
             # features[f[0]] = f[1].transform(df).iloc[0]
@@ -141,9 +144,7 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     # Return the data frame.
     return df
 
-
-if __name__ == "__main__":
-
+def frameworkRunner(featuresSelected) :
     input_dataframe = pd.read_csv("./Data/medium_dataset_raw.csv", dtype={'actionID': 'float'}, parse_dates=['timestamp'])
     # doing .head(200) causes us to lose valuable info such as unsubscribe actions
     # input_dataframe = input_dataframe.head(200)
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     percentChurnOut = 0.5
 
     listContactTimelines = getContactsForExperiment(input_dataframe, 16, percentChurnOut)
-    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, percentChurnOut)
+    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, percentChurnOut, featuresSelected)
     feature_df = transformLabelledPointsToDataFrame(listLabelledPoints)
 
     num_features = feature_df.shape[1]
@@ -172,4 +173,40 @@ if __name__ == "__main__":
     # by default performs StratifiedKFold CV
     metrics = ["accuracy", "precision", "recall", "f1"]
     results = cross_validate(abc, X, y, cv=5, scoring=metrics)
+
+    modified_results = [(k,np.mean(v)) for k,v in results.items()]
+    return modified_results
     # print(cross_val_score(abc, X, y, cv=5))
+
+
+# if __name__ == "__main__":
+
+#     input_dataframe = pd.read_csv("./Data/medium_dataset_raw.csv", dtype={'actionID': 'float'}, parse_dates=['timestamp'])
+#     # doing .head(200) causes us to lose valuable info such as unsubscribe actions
+#     # input_dataframe = input_dataframe.head(200)
+
+#     percentChurnOut = 0.5
+
+#     listContactTimelines = getContactsForExperiment(input_dataframe, 16, percentChurnOut)
+#     listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, percentChurnOut)
+#     feature_df = transformLabelledPointsToDataFrame(listLabelledPoints)
+
+#     num_features = feature_df.shape[1]
+
+#     # TODO: need to figure out how to do this masking without using column headers
+#     # int indices were not working at first might require indexing into columns name list to generate mask
+#     X = feature_df.loc[:, 'Feat_1':]
+#     y = feature_df.loc[:, :'Label']
+
+#     # changes shape of y from column vector to 1d array
+#     y = y.values.ravel()
+
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+
+#     abc = ensemble.AdaBoostClassifier()
+#     # abc.fit(X_train, y_train)
+#     # abc.score(X_train, y_train)
+#     # by default performs StratifiedKFold CV
+#     metrics = ["accuracy", "precision", "recall", "f1"]
+#     results = cross_validate(abc, X, y, cv=5, scoring=metrics)
+#     # print(cross_val_score(abc, X, y, cv=5))
