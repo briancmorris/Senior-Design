@@ -1,0 +1,23 @@
+.header {
+  padding: 12px;
+  width: 100%;
+  text-align: center;
+  font-size: 40;
+  background-color: coral;
+}
+
+.dbutton {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+.container{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: baseline;
+  padding-top: 30px;
+}
+h1.title {
+  font-size: 21px;
+}
