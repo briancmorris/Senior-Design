@@ -3,6 +3,7 @@
 
 import numpy as np
 import pandas as pd
+import time
 from typing import List, Dict, Any
 from datetime import *
 from uuid import uuid4
@@ -137,3 +138,4 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
     raw_df.to_csv(file_name)
 
     return file_name
+    

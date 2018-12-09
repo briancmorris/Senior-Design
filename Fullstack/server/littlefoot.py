@@ -144,8 +144,8 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     # Return the data frame.
     return df
 
-def frameworkRunner(featuresSelected) :
-    input_dataframe = pd.read_csv("./Data/medium_dataset_raw.csv", dtype={'actionID': 'float'}, parse_dates=['timestamp'])
+def frameworkRunner(featuresSelected, filename) :
+    input_dataframe = pd.read_csv("./Data/" + filename, dtype={'actionID': 'float'}, parse_dates=['timestamp'])
     # doing .head(200) causes us to lose valuable info such as unsubscribe actions
     # input_dataframe = input_dataframe.head(200)
 
