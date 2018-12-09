@@ -21,9 +21,7 @@ class FETotalForwarded(TransformerMixin):
 
         per_contact_groupby = X.groupby('contactID')
         Xz = per_contact_groupby.apply(lambda contact:
-                                       contact['actionID']
-                                       .filter(like=str(ActionEnum.FORWARD_FRIEND.value))
-                                       .count())
+                                       np.sum(contact['actionID'] == str(float(ActionEnum.FORWARD_FRIEND.value))))
         return Xz
 
 

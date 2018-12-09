@@ -27,7 +27,7 @@ def countEmailsOpened(contact):
     :return: the number of unique emails that the contact interacted with
     """
     # have to subtract 1 for all of the emails that do not have an emailID
-    return contact.emailID.unique().size - 1
+    return contact.emailID.unique().size
 
 
 def calculateProportionOpened(num_recv, num_open):
@@ -73,6 +73,7 @@ class PropOpenedTransformer(TransformerMixin):
         Xp['prop_opened'] = Xp['emails_open'] / Xp['emails_recv']
 
         Xp = Xp.drop(['emails_recv', 'emails_open'], axis=1)
+        Xp.fillna(0, inplace=True)
 
         return Xp
 
