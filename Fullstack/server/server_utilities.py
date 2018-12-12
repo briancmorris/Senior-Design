@@ -12,8 +12,8 @@ features = {
   'Email Frequency': EmailFrequencyFeatureTransformer, 
   'Lifespan': LifespanTransformer,
   'Total Links Clicked': TotalLinksClicked,
-  'Props Opened': PropOpenedTransformer,
-  'Emails Recieved': EmailsReceivedTransformer,
+  'Proportion Opened': PropOpenedTransformer,
+  'Emails Received': EmailsReceivedTransformer,
   'Emails Opened': EmailsOpenedTransformer,
   'Total Emails Forwarded': FETotalForwarded
   }
