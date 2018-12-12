@@ -14,4 +14,23 @@ features = {
   'Emails Opened': EmailsOpenedTransformer,
   }
 
+from sklearn.neural_network import MLPClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+models = {
+  'adaboost': AdaBoostClassifier,
+  'svc': SVC,
+  'knn': KNeighborsClassifier,
+  'mlp': MLPClassifier,
+  'decision_tree': DecisionTreeClassifier,
+  'random_forest': RandomForestClassifier,
+  'gaussian_naive_bayes': GaussianNB,
+  'quad_disc_analysis': QuadraticDiscriminantAnalysis,
+}
+
 framework = littlefoot

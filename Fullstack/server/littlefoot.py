@@ -143,12 +143,14 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     # Return the data frame.
     return df
 
-def frameworkRunner(featuresSelected, filename) :
+
+def frameworkRunner(featuresSelected, modelSelected, filename) :
     """
-    Runs the framework based on the features to be extracted and the file uploaded
-    :param featuresSelected: a list of feature extraction objects to be applied to the data
-    :param filename: the file that contains the weblog data of contact actions
-    :return: the model scoring metrics
+        Runs the framework based on the features to be extracted and the file uploaded
+        :param featuresSelected: a list of feature extraction objects to be applied to the data
+        :param modelSelected: the model selected on the front-end
+        :param filename: the file that contains the weblog data of contact actions
+        :return: the model scoring metrics
     """
     input_dataframe = pd.read_csv("./Data/" + filename, dtype={'actionID': 'float'}, parse_dates=['timestamp'])
 
@@ -172,7 +174,9 @@ def frameworkRunner(featuresSelected, filename) :
     # This is one way to do the test train split
     # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-    abc = ensemble.AdaBoostClassifier()
+    abc = modelSelected()
+    # abc.fit(X_train, y_train)
+    # abc.score(X_train, y_train)
     # by default performs StratifiedKFold CV
     metrics = ["accuracy", "precision", "recall", "f1"]
     results = cross_validate(abc, X, y, cv=5, scoring=metrics)

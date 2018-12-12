@@ -28,10 +28,11 @@ def downloadDataFile():
 @app.route("/setUp")
 def getProps():
     features = [k for k, v in server_utilities.features.items()]
+    models = [k for k, v in server_utilities.models.items()]
     setup = jsonify({
         "setup": {
             "features": features,
-            "models": ['Churn-out']
+            "models": models,
         }
     })
     return setup    
@@ -50,7 +51,10 @@ def getResults():
         file.save(os.path.join(app.root_path, 'Data', filename))
         featuresSelected = request.form['features']
         featuresToBeExtracted = [(k,v()) for k,v in server_utilities.features.items() if k in featuresSelected]
-        results = server_utilities.framework.frameworkRunner(featuresToBeExtracted, filename)
+
+        modelSelected = server_utilities.models[request.form['model']]
+
+        results = server_utilities.framework.frameworkRunner(featuresToBeExtracted, modelSelected, filename)
         return jsonify(results)
     
     
