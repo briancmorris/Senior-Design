@@ -27,18 +27,9 @@ class EmailsOpenedTransformer(TransformerMixin):
         contacts_with_actions = set(Xo.index.unique())
         if len(contacts_with_actions) < len(original_contacts):
             for contact in original_contacts - contacts_with_actions:
+                # assign 0 emails opened to contacts who have not interacted with emails
                 idx = pd.Index(name='contactID', data=[contact])
                 c = pd.DataFrame({'emails_opened':pd.Series([0], dtype='int', index=idx)})
                 Xo = Xo.append(c)
 
         return Xo
-
-
-if __name__ == "__main__":
-    # Pandas read_csv attempts to parse columns as string, int, or float.
-    # In this case, all columns are by default parsed as string.
-    # actionID must be parsed as float because of NaN values.
-    # timestamp converted to datetime64. Must specify 'timestamp' column so read_csv knows which columns to concatenate.
-    raw_df = pd.read_csv('medium_dataset_raw.csv', dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-    fe_opened = EmailsOpenedTransformer()
-    output = fe_opened.transform(raw_df)

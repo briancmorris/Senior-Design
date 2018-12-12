@@ -9,8 +9,6 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold, train_test
 from sklearn import ensemble
 
 from action_types import ActionEnum
-from feature_extraction.links_clicked import TotalLinksClicked
-from feature_extraction.total_fwd import FETotalForwarded
 
 class LabelledPoint:
     def __init__(self, label, features: List):
@@ -19,6 +17,16 @@ class LabelledPoint:
 
 
 def getContactsForExperiment(df: pd.DataFrame, numContacts: int, percentChurnedOut: float) -> List[pd.DataFrame]:
+    """
+    Selects the contacts from the dataset that will be used for the experiment
+
+    :param df: the weblog format of all contacts' actions
+    :param numContacts: the total number of contacts desired for the experiment
+    :param percentChurnedOut: the percentage of contacts selected who should be churned out
+    this helps prevent the model from being trained with too many or too few churned contacts
+    :return: a list of selected contacts as individual data frames
+    """
+
     result = []
 
     # only keep rows for contact actions
@@ -32,15 +40,15 @@ def getContactsForExperiment(df: pd.DataFrame, numContacts: int, percentChurnedO
     churned_df = df[df['actionID'] == float(ActionEnum.UNSUBSCRIBE.value)]
     if len(churned_df) < goalChurn:
         raise Exception('Not enough churned contacts in data set to meet goal')
-
-    # take the first of as many churned contacts as is desired
-    churn_contacts = churned_df.head(goalChurn).contactID
+    else:
+        # take the first of as many churned contacts as is desired
+        churn_contacts = churned_df.head(goalChurn).contactID
 
     # get list of contact IDs who did not unsubscribe in window
     sub_contacts = list(set(df.contactID.unique()) - set(churned_df.contactID.unique()))
     if len(sub_contacts) < goalSub:
-        raise Exception('Not enough subscribed contacts in data set to meet goal, will censor churned contacts')
         # could do censoring here
+        raise Exception('Not enough subscribed contacts in data set to meet goal, will censor churned contacts')
     else:
         # select first as many still subscribed contacts as is desired
         sub_contacts = sub_contacts[:goalSub]
@@ -56,63 +64,54 @@ def getContactsForExperiment(df: pd.DataFrame, numContacts: int, percentChurnedO
     return result
 
 
-def getLabelledPointsFromContacts(input: List[pd.DataFrame], percentChurnedOut: float, featuresSelected) -> List[LabelledPoint]:
-    # input dataframe is a list of data frames
-    # each dataframe represents a list of user actions (each with a timestamp)
+def getLabelledPointsFromContacts(input: List[pd.DataFrame], featuresSelected, email_df) -> List[LabelledPoint]:
+    """
+    Transforms a list of contact data frames into a list of labelled points for their past month of data
+    A labelled point corresponds to a single contact with its features extracted and a label added
+    The label is a 1 if the user has unsubscribed or 0 if they are still subscribed
 
-    # transformation requires sampling "dates" in each contact time line
-    #   for each date sampled, it represents a labelled point
-    #   this takes in arguments for checking
+    :param input: the list of contact data frames
+    :param featuresSelected: a list of feature extraction objects to be applied to the data
+    :return: a list of labelled points of contact actions
+    """
 
-    # output is a list of extracted labelled points
-    #   a single contact may provide multiple labelled points
     result = []
 
-    # tlc = TotalLinksClicked()
-    # tf = FETotalForwarded()
-    # features_to_be_extracted = [('links_clicked', tlc)]
-    # print(features_to_be_extracted)
-
-    # print(featuresSelected)
-
     for df in input:
-        # mask each df to only last month of activity
-        df = df[(df['timestamp'] > df['timestamp'].max() - pd.DateOffset(months=1))]
+        # mask each df to only last 3 months of activity
+        df = df[(df['timestamp'] > df['timestamp'].max() - pd.DateOffset(months=3))]
+        df = df.append(email_df)
 
         # check if current data frame contains an unsubscribe action
         label_churn = (1, 0)[float(ActionEnum.UNSUBSCRIBE.value) in df.actionID.values]
-        features = [] # {} to make a dictionary
+        features = []
         for f in featuresSelected:
-            # print(f[1].transform(df).iloc[0])
-            # builds a features DICTIONARY
-            # features[f[0]] = f[1].transform(df).iloc[0]
-
             # make a list of features
             features.append(f[1].transform(df).iloc[0])
+
         result.append(LabelledPoint(label_churn, features))
 
-    # return list of labelled points
-    # should retain correct ratio of churn/non-churn points
+    # return list of labelled points, should retain correct ratio of churn/non-churn points
     return result
 
 
 def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFrame:
     """
-        Transforms a list of N labelled points into an NxN pandas data frame. The first column has the label of the point.
-        Col_1 to Col_n holds extracted feature data. An example data frame has been illustrated below.
+    Transforms a list of N labelled points into an NxN pandas data frame. The first column has the label of the point.
+    Col_1 to Col_n holds extracted feature data. An example data frame has been illustrated below.
 
-        df:
-        Label    Feat_1   Feat_2  ...    Feat_n
-        Label_1  Feat_11  Feat_12 ...    Feat_1n
-        ...      ...      ...     ...    ...
-        Label_n  Feat_n1 Feat_n2  ...    Feat_nn
+    df:
+    Label    Feat_1   Feat_2  ...    Feat_n
+    Label_1  Feat_11  Feat_12 ...    Feat_1n
+    ...      ...      ...     ...    ...
+    Label_n  Feat_n1 Feat_n2  ...    Feat_nn
 
-        NOTE: This function does not error check the data contained within the labelled points, this should be done
-        wherever the list is built.
+    NOTE: This function does not error check the data contained within the labelled points, this should be done
+    wherever the list is built.
 
-        :param points: the list of labelled data points
-        :return: a pandas data frame representing the provided list of labelled points
-        """
+    :param points: the list of labelled data points
+    :return: a pandas data frame representing the provided list of labelled points
+    """
     # Get the length of the feature vector.
     len_features = len(points[0].features)
 
@@ -144,30 +143,38 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     # Return the data frame.
     return df
 
-def frameworkRunner(featuresSelected, filename) :
+
+def frameworkRunner(featuresSelected, modelSelected, filename) :
+    """
+        Runs the framework based on the features to be extracted and the file uploaded
+        :param featuresSelected: a list of feature extraction objects to be applied to the data
+        :param modelSelected: the model selected on the front-end
+        :param filename: the file that contains the weblog data of contact actions
+        :return: the model scoring metrics
+    """
     input_dataframe = pd.read_csv("./Data/" + filename, dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-    # doing .head(200) causes us to lose valuable info such as unsubscribe actions
-    # input_dataframe = input_dataframe.head(200)
 
+    # desired percentage of contacts who have churned out in the dataset
     percentChurnOut = 0.5
+    # desired number of contacts to be used in the dataset
+    numContacts = 50
 
-    listContactTimelines = getContactsForExperiment(input_dataframe, 16, percentChurnOut)
-    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, percentChurnOut, featuresSelected)
+    email_df = input_dataframe[input_dataframe.contactID.isna()]
+
+    listContactTimelines = getContactsForExperiment(input_dataframe, numContacts, percentChurnOut)
+    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, featuresSelected, email_df)
     feature_df = transformLabelledPointsToDataFrame(listLabelledPoints)
 
-    num_features = feature_df.shape[1]
-
-    # TODO: need to figure out how to do this masking without using column headers
-    # int indices were not working at first might require indexing into columns name list to generate mask
     X = feature_df.loc[:, 'Feat_1':]
     y = feature_df.loc[:, :'Label']
 
     # changes shape of y from column vector to 1d array
     y = y.values.ravel()
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    # This is one way to do the test train split
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-    abc = ensemble.AdaBoostClassifier()
+    abc = modelSelected()
     # abc.fit(X_train, y_train)
     # abc.score(X_train, y_train)
     # by default performs StratifiedKFold CV
@@ -176,37 +183,4 @@ def frameworkRunner(featuresSelected, filename) :
 
     modified_results = [(k,np.mean(v)) for k,v in results.items()]
     return modified_results
-    # print(cross_val_score(abc, X, y, cv=5))
 
-
-# if __name__ == "__main__":
-
-#     input_dataframe = pd.read_csv("./Data/medium_dataset_raw.csv", dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-#     # doing .head(200) causes us to lose valuable info such as unsubscribe actions
-#     # input_dataframe = input_dataframe.head(200)
-
-#     percentChurnOut = 0.5
-
-#     listContactTimelines = getContactsForExperiment(input_dataframe, 16, percentChurnOut)
-#     listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, percentChurnOut)
-#     feature_df = transformLabelledPointsToDataFrame(listLabelledPoints)
-
-#     num_features = feature_df.shape[1]
-
-#     # TODO: need to figure out how to do this masking without using column headers
-#     # int indices were not working at first might require indexing into columns name list to generate mask
-#     X = feature_df.loc[:, 'Feat_1':]
-#     y = feature_df.loc[:, :'Label']
-
-#     # changes shape of y from column vector to 1d array
-#     y = y.values.ravel()
-
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
-
-#     abc = ensemble.AdaBoostClassifier()
-#     # abc.fit(X_train, y_train)
-#     # abc.score(X_train, y_train)
-#     # by default performs StratifiedKFold CV
-#     metrics = ["accuracy", "precision", "recall", "f1"]
-#     results = cross_validate(abc, X, y, cv=5, scoring=metrics)
-#     # print(cross_val_score(abc, X, y, cv=5))

@@ -2,8 +2,12 @@ import pandas as pd
 from pathlib import Path
 from feature_extraction import lifespan
 
+
 class TestLifespan(object):
     def test_lifespan(self):
+        """
+        Tests the feature extractor "lifespan.py" for completeness and correctness.
+        """
         # Path generates an os agnostic path for the tests to be reached
         test_folder = Path('./Fullstack/server/feature_extraction/tests/test_files')
         test_file = test_folder / 'test_lifespan.csv'

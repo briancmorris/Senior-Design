@@ -1,6 +1,3 @@
-# Peter Girouard
-# 22 October 2018
-
 import pandas as pd
 import numpy as np
 from sklearn.base import TransformerMixin
@@ -26,21 +23,7 @@ def countEmailsOpened(contact):
     :param contact: the grouped contact data frame
     :return: the number of unique emails that the contact interacted with
     """
-    # have to subtract 1 for all of the emails that do not have an emailID
     return contact.emailID.unique().size
-
-
-def calculateProportionOpened(num_recv, num_open):
-    """
-    Calculate the proportion of received emails opened by a contact
-    :param num_recv: the number of emails received
-    :param num_open: the number of emails opened
-    :return: proportion of emails opened by a contact, nan if 0 emails were opened
-    """
-    if num_recv.emails_recv == 0:
-        return np.nan
-    else:
-        return num_open / num_recv
 
 class PropOpenedTransformer(TransformerMixin):
     def __init__(self):
@@ -76,12 +59,3 @@ class PropOpenedTransformer(TransformerMixin):
         Xp.fillna(0, inplace=True)
 
         return Xp
-
-if __name__ == "__main__":
-    # Pandas read_csv attempts to parse columns as string, int, or float.
-    # In this case, all columns are by default parsed as string.
-    # actionID must be parsed as float because of NaN values.
-    # timestamp converted to datetime64. Must specify 'timestamp' column so read_csv knows which columns to concatenate.
-    raw_df = pd.read_csv('medium_dataset_raw.csv', dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-    fe_prop_opened = PropOpenedTransformer()
-    output = fe_prop_opened.transform(raw_df)

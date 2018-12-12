@@ -34,8 +34,6 @@ def calculateEmailFrequency(contact, emails):
 
 
 class EmailFrequencyFeatureTransformer(TransformerMixin):
-    # FunctionTransformer but for pandas DataFrames
-
     def fit(self, X, y=None):
         return self
 
@@ -46,16 +44,8 @@ class EmailFrequencyFeatureTransformer(TransformerMixin):
         :return: each contact and the frequency at which they received emails
         """
         Xt = pd.DataFrame()
+
+        # emails will contain only information pertaining to emails being sent, because they have no associated contactID
         emails = X[X.contactID.isna()]
         Xt['email frequency'] = X.groupby('contactID').apply(lambda c: calculateEmailFrequency(c, emails))
         return Xt
-
-
-if __name__ == "__main__":
-    # Pandas read_csv attempts to parse columns as string, int, or float.
-    # In this case, all columns are by default parsed as string.
-    # actionID must be parsed as float because of NaN values.
-    # timestamp converted to datetime64. Must specify 'timestamp' column so read_csv knows which columns to concatenate.
-    raw_df = pd.read_csv('medium_dataset_raw.csv', dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-    fe_freq = EmailFrequencyFeatureTransformer()
-    output = fe_freq.transform(raw_df)

@@ -20,16 +20,8 @@ class FETotalForwarded(TransformerMixin):
         assert(isinstance(X, pd.DataFrame))
 
         per_contact_groupby = X.groupby('contactID')
+        # passes unit test but does not work from front-end
         Xz = per_contact_groupby.apply(lambda contact:
                                        np.sum(contact['actionID'] == str(float(ActionEnum.FORWARD_FRIEND.value))))
+
         return Xz
-
-
-if __name__ == "__main__":
-    # Pandas read_csv attempts to parse columns as string, int, or float.
-    # In this case, all columns are by default parsed as string.
-    # actionID must be parsed as float because of NaN values.
-    # timestamp converted to datetime64. Must specify 'timestamp' column so read_csv knows which columns to concatenate.
-    raw_df = pd.read_csv('medium_dataset_raw.csv', dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-    fe_total_forward = FETotalForwarded()
-    output = fe_total_forward.fit_transform(raw_df)
