@@ -21,6 +21,7 @@ class FETotalForwarded(TransformerMixin):
 
         per_contact_groupby = X.groupby('contactID')
         # passes unit test but does not work from front-end
-        Xz = per_contact_groupby.apply(lambda contact: np.sum(contact['actionID'] == str(float(ActionEnum.FORWARD_FRIEND.value))))
+        Xz = per_contact_groupby.apply(lambda contact:
+                                       np.sum(contact['actionID'] == str(float(ActionEnum.FORWARD_FRIEND.value))))
 
         return Xz
