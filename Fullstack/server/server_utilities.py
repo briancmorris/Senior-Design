@@ -1,5 +1,4 @@
 from feature_extraction.freq_emails import EmailFrequencyFeatureTransformer
-from feature_extraction.lifespan import LifespanTransformer
 from feature_extraction.links_clicked import TotalLinksClicked
 from feature_extraction.prop_opened import PropOpenedTransformer
 from feature_extraction.recv import EmailsReceivedTransformer
@@ -9,8 +8,7 @@ import littlefoot
 
 
 features = {
-  'Email Frequency': EmailFrequencyFeatureTransformer, 
-  'Lifespan': LifespanTransformer,
+  'Email Frequency': EmailFrequencyFeatureTransformer,
   'Total Links Clicked': TotalLinksClicked,
   'Proportion Opened': PropOpenedTransformer,
   'Emails Received': EmailsReceivedTransformer,
