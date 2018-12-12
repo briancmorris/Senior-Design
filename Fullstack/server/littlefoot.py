@@ -144,7 +144,7 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     # Return the data frame.
     return df
 
-def frameworkRunner(featuresSelected, filename) :
+def frameworkRunner(featuresSelected, modelSelected, filename) :
     input_dataframe = pd.read_csv("./Data/" + filename, dtype={'actionID': 'float'}, parse_dates=['timestamp'])
     # doing .head(200) causes us to lose valuable info such as unsubscribe actions
     # input_dataframe = input_dataframe.head(200)
@@ -167,7 +167,7 @@ def frameworkRunner(featuresSelected, filename) :
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
 
-    abc = ensemble.AdaBoostClassifier()
+    abc = modelSelected()
     # abc.fit(X_train, y_train)
     # abc.score(X_train, y_train)
     # by default performs StratifiedKFold CV
