@@ -2,8 +2,12 @@ import pandas as pd
 from pathlib import Path
 from feature_extraction import links_clicked
 
+
 class TestLinksClicked(object):
     def test_links_clicked(self):
+        """
+        Tests the feature extractor "links_clicked.py" for completeness and correctness.
+        """
         # Path generates an os agnostic path for the tests to be reached
         test_folder = Path('./Fullstack/server/feature_extraction/tests/test_files')
         test_file = test_folder / 'test_links_clicked.csv'
