@@ -64,7 +64,7 @@ def getContactsForExperiment(df: pd.DataFrame, numContacts: int, percentChurnedO
     return result
 
 
-def getLabelledPointsFromContacts(input: List[pd.DataFrame], featuresSelected) -> List[LabelledPoint]:
+def getLabelledPointsFromContacts(input: List[pd.DataFrame], featuresSelected, email_df) -> List[LabelledPoint]:
     """
     Transforms a list of contact data frames into a list of labelled points for their past month of data
     A labelled point corresponds to a single contact with its features extracted and a label added
@@ -78,8 +78,9 @@ def getLabelledPointsFromContacts(input: List[pd.DataFrame], featuresSelected) -
     result = []
 
     for df in input:
-        # mask each df to only last month of activity
-        df = df[(df['timestamp'] > df['timestamp'].max() - pd.DateOffset(months=1))]
+        # mask each df to only last 3 months of activity
+        df = df[(df['timestamp'] > df['timestamp'].max() - pd.DateOffset(months=3))]
+        df = df.append(email_df)
 
         # check if current data frame contains an unsubscribe action
         label_churn = (1, 0)[float(ActionEnum.UNSUBSCRIBE.value) in df.actionID.values]
@@ -156,8 +157,10 @@ def frameworkRunner(featuresSelected, filename) :
     # desired number of contacts to be used in the dataset
     numContacts = 50
 
+    email_df = input_dataframe[input_dataframe.contactID.isna()]
+
     listContactTimelines = getContactsForExperiment(input_dataframe, numContacts, percentChurnOut)
-    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, featuresSelected)
+    listLabelledPoints = getLabelledPointsFromContacts(listContactTimelines, featuresSelected, email_df)
     feature_df = transformLabelledPointsToDataFrame(listLabelledPoints)
 
     X = feature_df.loc[:, 'Feat_1':]

@@ -23,21 +23,7 @@ def countEmailsOpened(contact):
     :param contact: the grouped contact data frame
     :return: the number of unique emails that the contact interacted with
     """
-    # have to subtract 1 for all of the emails that do not have an emailID
     return contact.emailID.unique().size
-
-
-def calculateProportionOpened(num_recv, num_open):
-    """
-    Calculate the proportion of received emails opened by a contact
-    :param num_recv: the number of emails received
-    :param num_open: the number of emails opened
-    :return: proportion of emails opened by a contact, nan if 0 emails were opened
-    """
-    if num_recv.emails_recv == 0:
-        return np.nan
-    else:
-        return num_open / num_recv
 
 class PropOpenedTransformer(TransformerMixin):
     def __init__(self):
