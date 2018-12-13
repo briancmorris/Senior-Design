@@ -91,8 +91,6 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
         remove_contacts = []
         for contactID, info in all_contacts.items():
             # number of actions this contact will perform for the current email
-            # TODO: num_actions depends on how long this contact has been a subscriber
-            # TODO: num_actions should decrease in proportion to the length of time they have been a subscriber
             interest_ratio = 1 - (current_date - info['start_date']) / (VIEWERSHIP_SPAN * info['interest_rate'])
             if interest_ratio < CONTACT_INTEREST_DROPOUT_THRESHOLD:
                 contact_action_event = {
@@ -114,7 +112,6 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
             for i in range(num_actions):
                 # generate a series of actions offset randomly from the email arrival by some minutes
                 # in this case, the user selected a link from the email
-                # TODO: add some probability so that a contact occasionally forwards to a friend
                 contact_action_event = {
                     'emailID': CURRENT_EMAIL_ID,
                     'timestamp': current_date + timedelta(minutes=int(link_view_offsets[i])),
@@ -132,10 +129,8 @@ def generate_data_email_driven(START_DATE = datetime(2012, 1, 1), STOP_DATE = da
     raw_df = pd.DataFrame(data=all_actions,
                           columns=['contactID', 'actionID', 'emailID', 'timestamp', 'linkID'])
 
-    # TODO: handle potential file name collisions
     file_name = './Data/data_{:s}.csv'.format(datetime.now().strftime("%Y%m%d-%H%M%S"))
 
     raw_df.to_csv(file_name)
 
     return file_name
-    
