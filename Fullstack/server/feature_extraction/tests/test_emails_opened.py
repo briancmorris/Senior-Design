@@ -2,8 +2,12 @@ import pandas as pd
 from pathlib import Path
 from feature_extraction import total_emails_opened
 
+
 class TestEmailsOpened(object):
     def test_emails_opened(self):
+        """
+        Tests the feature extractor "total_emails_opened.py" for completeness and correctness.
+        """
         # Path generates an os agnostic path for the tests to be reached
         test_folder = Path('./Fullstack/server/feature_extraction/tests/test_files')
         test_file = test_folder / 'test_emails_opened.csv'
