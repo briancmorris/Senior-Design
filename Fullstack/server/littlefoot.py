@@ -144,20 +144,18 @@ def transformLabelledPointsToDataFrame(points: List[LabelledPoint]) -> pd.DataFr
     return df
 
 
-def frameworkRunner(featuresSelected, modelSelected, filename, fileroot = "./Data/") :
+def frameworkRunner(featuresSelected, modelSelected, filename, fileroot="./Data/", percentChurnOut=0.5, numContacts=50) :
     """
         Runs the framework based on the features to be extracted and the file uploaded
         :param featuresSelected: a list of feature extraction objects to be applied to the data
         :param modelSelected: the model selected on the front-end
         :param filename: the file that contains the weblog data of contact actions
+        :param fileroot: needed to test the function, but can also point the framework to different file locations
+        :param percentChurnOut: desired percentage of contacts who have churned out in the dataset
+        :param numContacts: desired number of contacts to be used in the dataset
         :return: the model scoring metrics
     """
     input_dataframe = pd.read_csv(fileroot + filename, dtype={'actionID': 'float'}, parse_dates=['timestamp'])
-
-    # desired percentage of contacts who have churned out in the dataset
-    percentChurnOut = 0.5
-    # desired number of contacts to be used in the dataset
-    numContacts = 50
 
     email_df = input_dataframe[input_dataframe.contactID.isna()]
 
@@ -183,4 +181,3 @@ def frameworkRunner(featuresSelected, modelSelected, filename, fileroot = "./Dat
 
     modified_results = [(k,np.mean(v)) for k,v in results.items()]
     return modified_results
-
